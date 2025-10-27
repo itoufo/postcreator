@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useSNSConnections } from '@/hooks/useSNSConnections';
+import { useAccounts } from '@/hooks/useAccounts';
 import type { SNSType } from '@/types';
 
 export default function SNSConnections() {
   const { connections, loading, deleteConnection } = useSNSConnections();
+  const { accounts } = useAccounts();
   const [showAddModal, setShowAddModal] = useState(false);
 
   const handleDelete = async (id: string, name: string) => {
@@ -38,34 +40,44 @@ export default function SNSConnections() {
         </div>
       ) : (
         <div className="space-y-4">
-          {connections.map((conn) => (
-            <div
-              key={conn.id}
-              className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
-                      {conn.sns_type}
-                    </span>
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {conn.connection_name}
-                    </h3>
-                    {conn.is_active ? (
-                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                        有効
+          {connections.map((conn) => {
+            const linkedAccount = conn.account_id
+              ? accounts.find((acc) => acc.id === conn.account_id)
+              : null;
+
+            return (
+              <div
+                key={conn.id}
+                className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                        {conn.sns_type}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                        無効
-                      </span>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {conn.connection_name}
+                      </h3>
+                      {conn.is_active ? (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                          有効
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                          無効
+                        </span>
+                      )}
+                    </div>
+                    {linkedAccount && (
+                      <p className="mt-2 text-sm text-gray-600">
+                        紐付けアカウント: <span className="font-medium text-gray-900">{linkedAccount.name}</span>
+                      </p>
                     )}
+                    <p className="mt-1 text-sm text-gray-600">
+                      作成日: {new Date(conn.created_at).toLocaleDateString('ja-JP')}
+                    </p>
                   </div>
-                  <p className="mt-2 text-sm text-gray-600">
-                    作成日: {new Date(conn.created_at).toLocaleDateString('ja-JP')}
-                  </p>
-                </div>
                 <button
                   onClick={() => handleDelete(conn.id, conn.connection_name)}
                   className="ml-4 px-3 py-1 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50"
@@ -74,7 +86,8 @@ export default function SNSConnections() {
                 </button>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       )}
 
@@ -89,11 +102,13 @@ export default function SNSConnections() {
 function AddConnectionModal({ onClose }: { onClose: () => void }) {
   const [snsType, setSnsType] = useState<SNSType>('X');
   const [connectionName, setConnectionName] = useState('');
+  const [accountId, setAccountId] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [tokenSecret, setTokenSecret] = useState('');
   const [saving, setSaving] = useState(false);
 
   const { createConnection } = useSNSConnections();
+  const { accounts } = useAccounts();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +127,8 @@ function AddConnectionModal({ onClose }: { onClose: () => void }) {
       const result = await createConnection(
         snsType,
         connectionName,
-        credentials
+        credentials,
+        accountId || undefined
       );
 
       if (result.error) {
@@ -140,7 +156,10 @@ function AddConnectionModal({ onClose }: { onClose: () => void }) {
             </label>
             <select
               value={snsType}
-              onChange={(e) => setSnsType(e.target.value as SNSType)}
+              onChange={(e) => {
+                setSnsType(e.target.value as SNSType);
+                setAccountId(''); // SNS変更時にアカウント選択をリセット
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
@@ -149,6 +168,29 @@ function AddConnectionModal({ onClose }: { onClose: () => void }) {
               <option value="Instagram">Instagram</option>
               <option value="note">note</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              紐付けアカウント（任意）
+            </label>
+            <select
+              value={accountId}
+              onChange={(e) => setAccountId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">アカウントを選択しない</option>
+              {accounts
+                .filter((acc) => acc.default_sns === snsType)
+                .map((account) => (
+                  <option key={account.id} value={account.id}>
+                    {account.name}
+                  </option>
+                ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              特定のアカウントに紐付けると、そのアカウントで投稿する際に自動的にこの接続が使用されます
+            </p>
           </div>
 
           <div>
