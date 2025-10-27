@@ -7,6 +7,8 @@ export function useGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<GeneratedPostResults | null>(null);
   const [checks, setChecks] = useState<QualityChecks | null>(null);
+  const [resultId, setResultId] = useState<string | null>(null);
+  const [currentInputs, setCurrentInputs] = useState<GenerationInputs | null>(null);
 
   const generatePost = async (account: Account, inputs: GenerationInputs) => {
     try {
@@ -14,6 +16,8 @@ export function useGenerator() {
       setError(null);
       setResult(null);
       setChecks(null);
+      setResultId(null);
+      setCurrentInputs(inputs);
 
       // 1. リクエストレコードを作成
       const { data: { user } } = await supabase.auth.getUser();
@@ -70,7 +74,7 @@ export function useGenerator() {
         .eq('id', typedRequestData.id);
 
       // 4. 結果を保存
-      await supabase.from('snsgen_results').insert({
+      const { data: resultData, error: resultError } = await (supabase.from('snsgen_results') as any).insert({
         request_id: typedRequestData.id,
         sns: inputs.sns,
         post_type: inputs.post_type,
@@ -82,7 +86,11 @@ export function useGenerator() {
         } as any,
         hashtags: data.results.hashtags || [],
         checks: data.checks || {} as any,
-      } as any);
+      } as any).select().single();
+
+      if (!resultError && resultData) {
+        setResultId((resultData as any).id);
+      }
 
       return { data: data.results, error: null };
     } catch (err) {
@@ -98,6 +106,8 @@ export function useGenerator() {
     setResult(null);
     setChecks(null);
     setError(null);
+    setResultId(null);
+    setCurrentInputs(null);
   };
 
   return {
@@ -105,6 +115,8 @@ export function useGenerator() {
     error,
     result,
     checks,
+    resultId,
+    currentInputs,
     generatePost,
     clearResult,
   };

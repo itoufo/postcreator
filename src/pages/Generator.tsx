@@ -7,7 +7,7 @@ import type { Account, GenerationInputs } from '@/types';
 
 export default function Generator() {
   const { accounts, loading: accountsLoading } = useAccounts();
-  const { loading, error, result, checks, generatePost, clearResult } = useGenerator();
+  const { loading, error, result, checks, resultId, currentInputs, generatePost, clearResult } = useGenerator();
 
   const handleGenerate = async (account: Account, inputs: GenerationInputs) => {
     await generatePost(account, inputs);
@@ -96,7 +96,13 @@ export default function Generator() {
             </div>
             <div>
               {result ? (
-                <ResultDisplay result={result} checks={checks} onClear={clearResult} />
+                <ResultDisplay
+                  result={result}
+                  checks={checks}
+                  resultId={resultId || undefined}
+                  snsType={currentInputs?.sns}
+                  onClear={clearResult}
+                />
               ) : (
                 <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
                   <svg
