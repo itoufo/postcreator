@@ -219,6 +219,26 @@ export interface GeneratedPostResults {
   hashtags: string[];
 }
 
+// SNS接続情報
+export interface SNSConnection {
+  id: string;
+  user_id: string;
+  account_id?: string;
+  sns_type: SNSType;
+  connection_name: string;
+  credentials: {
+    access_token: string;
+    refresh_token?: string;
+    token_secret?: string;
+    expires_at?: string;
+    [key: string]: unknown;
+  };
+  metadata: Record<string, unknown>;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Edge Function レスポンス
 export interface GeneratePostResponse {
   request_id: string;

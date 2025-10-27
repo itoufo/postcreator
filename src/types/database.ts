@@ -180,6 +180,9 @@ export interface Database {
           score: number | null;
           note: string | null;
           is_published: boolean;
+          connection_id: string | null;
+          published_at: string | null;
+          publish_error: string | null;
           created_at: string;
         };
         Insert: {
@@ -194,6 +197,9 @@ export interface Database {
           score?: number | null;
           note?: string | null;
           is_published?: boolean;
+          connection_id?: string | null;
+          published_at?: string | null;
+          publish_error?: string | null;
           created_at?: string;
         };
         Update: {
@@ -208,6 +214,9 @@ export interface Database {
           score?: number | null;
           note?: string | null;
           is_published?: boolean;
+          connection_id?: string | null;
+          published_at?: string | null;
+          publish_error?: string | null;
           created_at?: string;
         };
       };
@@ -239,6 +248,44 @@ export interface Database {
           type?: 'hashtags' | 'cta' | 'synonyms' | 'domain_terms';
           name?: string;
           entries?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      snsgen_connections: {
+        Row: {
+          id: string;
+          user_id: string;
+          account_id: string | null;
+          sns_type: 'X' | 'Instagram' | 'Threads' | 'note';
+          connection_name: string;
+          credentials: Json;
+          metadata: Json;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          account_id?: string | null;
+          sns_type: 'X' | 'Instagram' | 'Threads' | 'note';
+          connection_name: string;
+          credentials: Json;
+          metadata?: Json;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          account_id?: string | null;
+          sns_type?: 'X' | 'Instagram' | 'Threads' | 'note';
+          connection_name?: string;
+          credentials?: Json;
+          metadata?: Json;
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };

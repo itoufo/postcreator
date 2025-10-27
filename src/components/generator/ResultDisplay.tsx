@@ -1,15 +1,26 @@
 import { useState } from 'react';
-import type { GeneratedPostResults, QualityChecks } from '@/types';
+import type { GeneratedPostResults, QualityChecks, SNSType } from '@/types';
+import { useSNSConnections } from '@/hooks/useSNSConnections';
+import { useSocialPublish } from '@/hooks/useSocialPublish';
 
 interface ResultDisplayProps {
   result: GeneratedPostResults;
   checks: QualityChecks | null;
+  resultId?: string;
+  snsType?: SNSType;
   onClear: () => void;
 }
 
-export default function ResultDisplay({ result, checks, onClear }: ResultDisplayProps) {
+export default function ResultDisplay({ result, checks, resultId, snsType, onClear }: ResultDisplayProps) {
   const [activeTab, setActiveTab] = useState<'main' | 'alt1' | 'alt2' | 'short'>('main');
   const [copied, setCopied] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [selectedConnection, setSelectedConnection] = useState<string>('');
+
+  const { getConnectionsBySNS } = useSNSConnections();
+  const { publishing, error: publishError, publishToSNS } = useSocialPublish();
+
+  const availableConnections = snsType ? getConnectionsBySNS(snsType) : [];
 
   const tabs = [
     { key: 'main' as const, label: '本命案', content: result.main },
@@ -27,6 +38,25 @@ export default function ResultDisplay({ result, checks, onClear }: ResultDisplay
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('コピーに失敗しました:', err);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!selectedConnection || !resultId || !snsType) return;
+
+    const publishResult = await publishToSNS({
+      resultId,
+      connectionId: selectedConnection,
+      content: activeContent,
+      snsType,
+      hashtags: result.hashtags,
+    });
+
+    if (!publishResult.error) {
+      setShowPublishModal(false);
+      alert('投稿が完了しました！');
+    } else {
+      alert(`投稿に失敗しました: ${publishResult.error}`);
     }
   };
 
@@ -141,7 +171,83 @@ export default function ResultDisplay({ result, checks, onClear }: ResultDisplay
         >
           ハッシュタグ込みでコピー
         </button>
+        {snsType && resultId && (
+          <button
+            onClick={() => setShowPublishModal(true)}
+            className="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
+          >
+            {snsType}に投稿
+          </button>
+        )}
       </div>
+
+      {/* 投稿モーダル */}
+      {showPublishModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {snsType}に投稿
+            </h3>
+
+            {availableConnections.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600 mb-4">
+                  {snsType}の接続情報が登録されていません
+                </p>
+                <button
+                  onClick={() => setShowPublishModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  閉じる
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    投稿先アカウントを選択
+                  </label>
+                  <select
+                    value={selectedConnection}
+                    onChange={(e) => setSelectedConnection(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">選択してください</option>
+                    {availableConnections.map((conn) => (
+                      <option key={conn.id} value={conn.id}>
+                        {conn.connection_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {publishError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
+                    {publishError}
+                  </div>
+                )}
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setShowPublishModal(false)}
+                    disabled={publishing}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={handlePublish}
+                    disabled={!selectedConnection || publishing}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {publishing ? '投稿中...' : '投稿する'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
