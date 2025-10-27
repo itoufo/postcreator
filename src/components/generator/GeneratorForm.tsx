@@ -33,7 +33,8 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
   // SNS変更時にデフォルト値を更新
   useEffect(() => {
     const profile = SNS_PROFILES[sns];
-    setMaxChars(profile.max_chars);
+    // 文字数は3000を上限とする
+    setMaxChars(Math.min(profile.max_chars, 3000));
     setHashtagMax(profile.hashtags.recommended[1]);
     // 投稿種別をSNSに応じてリセット
     const availableTypes = SNS_POST_TYPES[sns];
@@ -182,7 +183,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
             <input
               type="range"
               min={SNS_PROFILES[sns].short_chars[0]}
-              max={SNS_PROFILES[sns].max_chars}
+              max={3000}
               value={maxChars}
               onChange={(e) => setMaxChars(Number(e.target.value))}
               className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
@@ -190,7 +191,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>短め</span>
               <span>推奨: {SNS_PROFILES[sns].recommended_chars[0]}-{SNS_PROFILES[sns].recommended_chars[1]}</span>
-              <span>最大: {SNS_PROFILES[sns].max_chars}</span>
+              <span>SNS最大: {SNS_PROFILES[sns].max_chars} / 設定可能: 3000</span>
             </div>
           </div>
 
