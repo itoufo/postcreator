@@ -6,6 +6,7 @@ import Dashboard from '@/pages/Dashboard';
 import Accounts from '@/pages/Accounts';
 import Generator from '@/pages/Generator';
 import History from '@/pages/History';
+import Settings from '@/pages/Settings';
 
 function App() {
   return (
@@ -42,6 +43,14 @@ function App() {
           element={
             <AuthGuard>
               <History />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <AuthGuard>
+              <Settings />
             </AuthGuard>
           }
         />

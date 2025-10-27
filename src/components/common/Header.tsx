@@ -48,6 +48,12 @@ export default function Header() {
             >
               履歴
             </button>
+            <button
+              onClick={() => navigate('/settings')}
+              className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+            >
+              設定
+            </button>
           </nav>
 
           <div className="flex items-center space-x-4">
