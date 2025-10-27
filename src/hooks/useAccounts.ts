@@ -44,6 +44,7 @@ export function useAccounts() {
         .insert({
           user_id: user.id,
           name: account.name,
+          default_sns: account.default_sns,
           theme: account.theme,
           persona: account.persona as any,
           tone_guidelines: account.tone_guidelines as any,

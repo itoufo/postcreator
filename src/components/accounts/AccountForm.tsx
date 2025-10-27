@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Account } from '@/types';
+import type { Account, SNSType } from '@/types';
 import { PERSONA_SAMPLES } from '@/lib/constants';
 
 interface AccountFormProps {
@@ -11,6 +11,7 @@ interface AccountFormProps {
 export default function AccountForm({ account, onSave, onCancel }: AccountFormProps) {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
+  const [defaultSns, setDefaultSns] = useState<SNSType>('X');
   const [theme, setTheme] = useState('');
   const [targetAge, setTargetAge] = useState('');
   const [interests, setInterests] = useState('');
@@ -27,6 +28,7 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
   useEffect(() => {
     if (account) {
       setName(account.name);
+      setDefaultSns(account.default_sns || 'X');
       setTheme(account.theme || '');
       setTargetAge(account.persona.target_age || '');
       setInterests(Array.isArray(account.persona.interests) ? account.persona.interests.join(', ') : '');
@@ -78,6 +80,7 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
     try {
       await onSave({
         name,
+        default_sns: defaultSns,
         theme,
         persona: {
           target_age: targetAge,
@@ -124,6 +127,25 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="例: AI活用ブログ"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                対象SNS *
+              </label>
+              <select
+                value={defaultSns}
+                onChange={(e) => setDefaultSns(e.target.value as SNSType)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="X">X (Twitter)</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Threads">Threads</option>
+                <option value="note">note</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                このアカウントで投稿を生成する対象のSNSを選択してください
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

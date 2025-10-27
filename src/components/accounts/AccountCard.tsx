@@ -10,8 +10,13 @@ export default function AccountCard({ account, onEdit, onDelete }: AccountCardPr
   return (
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
       <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{account.name}</h3>
+        <div className="flex-1">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-semibold text-gray-900">{account.name}</h3>
+            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+              {account.default_sns}
+            </span>
+          </div>
           {account.theme && (
             <p className="text-sm text-gray-600 mt-1">{account.theme}</p>
           )}

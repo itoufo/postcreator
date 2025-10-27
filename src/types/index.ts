@@ -67,6 +67,7 @@ export interface Account {
   id: string;
   user_id: string;
   name: string;
+  default_sns: SNSType;
   theme?: string;
   persona: {
     target_age?: string;

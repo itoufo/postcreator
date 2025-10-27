@@ -20,6 +20,16 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
   const [emojiLevel, setEmojiLevel] = useState<'none' | 'light' | 'moderate' | 'heavy'>('moderate');
   const [ctaLevel, setCtaLevel] = useState<'none' | 'weak' | 'strong'>('weak');
 
+  // アカウント選択時にそのアカウントのSNSを自動設定
+  useEffect(() => {
+    if (selectedAccountId) {
+      const selectedAccount = accounts.find((acc) => acc.id === selectedAccountId);
+      if (selectedAccount && selectedAccount.default_sns) {
+        setSns(selectedAccount.default_sns);
+      }
+    }
+  }, [selectedAccountId, accounts]);
+
   // SNS変更時にデフォルト値を更新
   useEffect(() => {
     const profile = SNS_PROFILES[sns];
@@ -81,7 +91,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
           <option value="">選択してください</option>
           {accounts.map((account) => (
             <option key={account.id} value={account.id}>
-              {account.name}
+              [{account.default_sns}] {account.name}
               {account.theme && ` - ${account.theme}`}
             </option>
           ))}
@@ -98,13 +108,19 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
             required
             value={sns}
             onChange={(e) => setSns(e.target.value as SNSType)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={!!selectedAccountId}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
             <option value="X">X（旧Twitter）</option>
             <option value="Instagram">Instagram</option>
             <option value="Threads">Threads</option>
             <option value="note">note</option>
           </select>
+          {selectedAccountId && (
+            <p className="mt-1 text-xs text-gray-500">
+              選択したアカウントのSNSが自動的に設定されます
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

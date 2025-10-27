@@ -49,6 +49,7 @@ export interface Database {
           id: string;
           user_id: string;
           name: string;
+          default_sns: 'X' | 'Instagram' | 'Threads' | 'note';
           theme: string | null;
           persona: Json;
           tone_guidelines: Json;
@@ -63,6 +64,7 @@ export interface Database {
           id?: string;
           user_id: string;
           name: string;
+          default_sns?: 'X' | 'Instagram' | 'Threads' | 'note';
           theme?: string | null;
           persona?: Json;
           tone_guidelines?: Json;
@@ -77,6 +79,7 @@ export interface Database {
           id?: string;
           user_id?: string;
           name?: string;
+          default_sns?: 'X' | 'Instagram' | 'Threads' | 'note';
           theme?: string | null;
           persona?: Json;
           tone_guidelines?: Json;
