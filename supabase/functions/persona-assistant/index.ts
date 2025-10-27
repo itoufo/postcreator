@@ -37,6 +37,7 @@ serve(async (req) => {
     if (!claudeApiKey) {
       throw new Error('ANTHROPIC_API_KEY not configured');
     }
+    console.log('API Key exists:', !!claudeApiKey, 'Length:', claudeApiKey?.length);
 
     // Build system prompt based on action
     let systemPrompt = '';
@@ -95,6 +96,15 @@ serve(async (req) => {
     }
 
     // Call Claude API
+    const requestBody = {
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: messages,
+    };
+
+    console.log('Claude API request:', JSON.stringify(requestBody, null, 2));
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -102,20 +112,29 @@ serve(async (req) => {
         'x-api-key': claudeApiKey,
         'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2000,
-        system: systemPrompt,
-        messages: messages,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Claude API error response:', errorData);
       throw new Error(`Claude API error: ${JSON.stringify(errorData)}`);
     }
 
     const data = await response.json();
+    console.log('Claude API response:', JSON.stringify(data, null, 2));
+
+    // Validate response structure
+    if (!data.content || !Array.isArray(data.content) || data.content.length === 0) {
+      console.error('Invalid Claude API response structure:', data);
+      throw new Error('Invalid response from Claude API: missing content');
+    }
+
+    if (!data.content[0].text) {
+      console.error('Invalid Claude API content:', data.content[0]);
+      throw new Error('Invalid response from Claude API: missing text in content');
+    }
+
     const assistantMessage = data.content[0].text;
 
     // Check if ready for proposals
