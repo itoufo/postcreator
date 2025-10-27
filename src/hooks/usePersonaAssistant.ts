@@ -123,15 +123,25 @@ export function usePersonaAssistant() {
 
       // Parse the JSON response
       try {
-        const parsed = JSON.parse(data.message);
+        let jsonStr = data.message;
+
+        // Extract JSON from message if it contains extra text
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonStr = jsonMatch[0];
+        }
+
+        const parsed = JSON.parse(jsonStr);
         if (parsed.personas && Array.isArray(parsed.personas)) {
           setProposals(parsed.personas);
           return { success: true, personas: parsed.personas };
         } else {
-          throw new Error('Invalid persona format');
+          throw new Error('Invalid persona format: personas array not found');
         }
       } catch (parseError) {
-        throw new Error('ペルソナの解析に失敗しました');
+        console.error('Parse error:', parseError);
+        console.error('Raw message:', data.message);
+        throw new Error(`ペルソナの解析に失敗しました: ${parseError instanceof Error ? parseError.message : '不明なエラー'}`);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'ペルソナの生成に失敗しました';

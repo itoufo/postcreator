@@ -65,15 +65,22 @@ serve(async (req) => {
 
 会話は日本語で、フレンドリーかつプロフェッショナルなトーンで行ってください。`;
     } else if (action === 'generate_proposals') {
-      systemPrompt = `あなたはSNSマーケティングの専門家です。これまでの会話から、3つの異なるペルソナ案を提案してください。
+      systemPrompt = `あなたはJSON生成APIです。これまでの会話から、3つの異なるペルソナ案をJSON形式で出力してください。
 
-各ペルソナは以下の形式のJSONで出力してください：
+**絶対に守ること：**
+- 出力は必ず有効なJSONのみ
+- 説明文、挨拶、コメントは一切不要
+- 最初の文字は必ず「{」で始まる
+- 最後の文字は必ず「}」で終わる
+- JSON以外のテキストを含めてはいけない
+
+**出力フォーマット（必ずこの構造を守る）：**
 
 {
   "personas": [
     {
-      "name": "ペルソナの名前（例: 忙しい若手ビジネスパーソン）",
-      "target_age": "年齢層（例: 25-34）",
+      "name": "ペルソナの名前",
+      "target_age": "年齢層",
       "interests": ["興味1", "興味2", "興味3"],
       "pain_points": ["課題1", "課題2", "課題3"],
       "benefits": ["提供価値1", "提供価値2", "提供価値3"],
@@ -82,23 +89,24 @@ serve(async (req) => {
         "solution": "救い・商品による解決策の描写（2-3文）",
         "success": "成功・結果の具体的な描写（2-3文）"
       },
-      "rationale": "なぜこのペルソナを提案するのか、1-2文で説明"
+      "rationale": "なぜこのペルソナを提案するのか（1-2文）"
     }
   ]
 }
 
-重要：
-- 3つの異なる角度からペルソナを提案する（例: 初心者向け、中級者向け、専門家向け）
-- 各ペルソナは具体的で実用的であること
-- ストーリーは「難関→救い→成功」の流れで、共感を生む具体的なシナリオを描く
-- 会話から得られた情報を活用すること
-- JSONのみを出力し、他のテキストは含めない`;
+**ペルソナ作成のガイドライン：**
+- 3つの異なる角度から提案（初心者/中級者/専門家など）
+- 各ペルソナは具体的で実用的に
+- ストーリーは「難関→救い→成功」の流れ
+- 会話から得られた情報を活用
+
+**重要：このレスポンスはプログラムが解析するため、JSON以外の一切のテキストを含めないでください。**`;
     }
 
     // Call Claude API
     const requestBody = {
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 2000,
+      model: "claude-sonnet-4-5",
+      max_tokens: 3000,
       system: systemPrompt,
       messages: messages,
     };
@@ -137,9 +145,23 @@ serve(async (req) => {
 
     const assistantMessage = data.content[0].text;
 
+    // For generate_proposals, extract JSON if wrapped in extra text
+    let finalMessage = assistantMessage;
+    if (action === 'generate_proposals') {
+      const jsonMatch = assistantMessage.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        finalMessage = jsonMatch[0];
+        console.log('Extracted JSON from response');
+      } else {
+        console.warn('No JSON found in generate_proposals response:', assistantMessage);
+      }
+    }
+
     // Check if ready for proposals
     const isReadyForProposals = assistantMessage.includes('[READY_FOR_PROPOSALS]');
-    const cleanedMessage = assistantMessage.replace('[READY_FOR_PROPOSALS]', '').trim();
+    const cleanedMessage = action === 'chat'
+      ? finalMessage.replace('[READY_FOR_PROPOSALS]', '').trim()
+      : finalMessage;
 
     return new Response(
       JSON.stringify({
