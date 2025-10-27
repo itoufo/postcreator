@@ -12,7 +12,7 @@ export interface PersonaProposal {
   interests: string[];
   pain_points: string[];
   benefits: string[];
-  story: {
+  story?: {
     hardship: string;
     solution: string;
     success: string;
@@ -133,6 +133,15 @@ export function usePersonaAssistant() {
 
         const parsed = JSON.parse(jsonStr);
         if (parsed.personas && Array.isArray(parsed.personas)) {
+          // Log each persona to check if story field exists
+          parsed.personas.forEach((persona: PersonaProposal, idx: number) => {
+            console.log(`Persona ${idx + 1}:`, {
+              name: persona.name,
+              hasStory: !!persona.story,
+              story: persona.story,
+            });
+          });
+
           setProposals(parsed.personas);
           return { success: true, personas: parsed.personas };
         } else {

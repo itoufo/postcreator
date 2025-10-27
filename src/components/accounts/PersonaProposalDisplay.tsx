@@ -115,23 +115,31 @@ export default function PersonaProposalDisplay({
                 </div>
 
                 {/* ストーリー */}
-                <div className="border-t pt-3">
-                  <h6 className="font-medium text-gray-700 mb-2">ストーリー（難関→救い→成功）</h6>
-                  <div className="space-y-2">
-                    <div className="bg-red-50 border-l-4 border-red-400 p-2 rounded">
-                      <span className="font-semibold text-red-800 text-xs">難関: </span>
-                      <span className="text-gray-700">{persona.story.hardship}</span>
-                    </div>
-                    <div className="bg-blue-50 border-l-4 border-blue-400 p-2 rounded">
-                      <span className="font-semibold text-blue-800 text-xs">救い: </span>
-                      <span className="text-gray-700">{persona.story.solution}</span>
-                    </div>
-                    <div className="bg-green-50 border-l-4 border-green-400 p-2 rounded">
-                      <span className="font-semibold text-green-800 text-xs">成功: </span>
-                      <span className="text-gray-700">{persona.story.success}</span>
+                {persona.story && (
+                  <div className="border-t pt-3">
+                    <h6 className="font-medium text-gray-700 mb-2">ストーリー（難関→救い→成功）</h6>
+                    <div className="space-y-2">
+                      {persona.story.hardship && (
+                        <div className="bg-red-50 border-l-4 border-red-400 p-2 rounded">
+                          <span className="font-semibold text-red-800 text-xs">難関: </span>
+                          <span className="text-gray-700">{persona.story.hardship}</span>
+                        </div>
+                      )}
+                      {persona.story.solution && (
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-2 rounded">
+                          <span className="font-semibold text-blue-800 text-xs">救い: </span>
+                          <span className="text-gray-700">{persona.story.solution}</span>
+                        </div>
+                      )}
+                      {persona.story.success && (
+                        <div className="bg-green-50 border-l-4 border-green-400 p-2 rounded">
+                          <span className="font-semibold text-green-800 text-xs">成功: </span>
+                          <span className="text-gray-700">{persona.story.success}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           ))}

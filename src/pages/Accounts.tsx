@@ -56,10 +56,14 @@ export default function Accounts() {
         must_include: [],
         banned_terms: [],
         knowledge_base: `このペルソナは以下の理由で作成されました：\n${persona.rationale}`,
-        story: {
+        story: persona.story ? {
           hardship: persona.story.hardship,
           solution: persona.story.solution,
           success: persona.story.success,
+        } : {
+          hardship: '',
+          solution: '',
+          success: '',
         },
         link_policy: {},
       };
