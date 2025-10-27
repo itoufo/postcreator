@@ -121,15 +121,40 @@ export function usePersonaAssistant() {
 
       const data = await response.json();
 
-      // Parse the JSON response
+      // Parse the JSON response with aggressive cleaning
       try {
         let jsonStr = data.message;
 
-        // Extract JSON from message if it contains extra text
+        console.log('Raw response (first 200 chars):', jsonStr.substring(0, 200));
+
+        // Remove leading/trailing whitespace and newlines
+        jsonStr = jsonStr.trim();
+
+        // If starts with newlines and quotes, clean it up
+        if (jsonStr.match(/^\s*["']/)) {
+          // Try to find where the actual JSON starts
+          const personasMatch = jsonStr.match(/["']personas["']\s*:/);
+          if (personasMatch) {
+            // Found "personas": so we can build a complete JSON
+            const startIndex = jsonStr.indexOf(personasMatch[0]);
+            jsonStr = '{' + jsonStr.substring(startIndex);
+          }
+        }
+
+        // If it doesn't start with {, prepend it
+        if (!jsonStr.startsWith('{')) {
+          console.warn('Response does not start with {, prepending...');
+          console.log('Before fix:', jsonStr.substring(0, 100));
+          jsonStr = '{' + jsonStr;
+        }
+
+        // Extract JSON object (handle cases with extra text before/after)
         const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           jsonStr = jsonMatch[0];
         }
+
+        console.log('Cleaned JSON (first 200 chars):', jsonStr.substring(0, 200));
 
         const parsed = JSON.parse(jsonStr);
         if (parsed.personas && Array.isArray(parsed.personas)) {

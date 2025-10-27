@@ -166,15 +166,36 @@ serve(async (req) => {
 
     const assistantMessage = data.content[0].text;
 
-    // For generate_proposals, extract JSON if wrapped in extra text
+    // For generate_proposals, ensure we have valid JSON
     let finalMessage = assistantMessage;
     if (action === 'generate_proposals') {
-      const jsonMatch = assistantMessage.match(/\{[\s\S]*\}/);
+      console.log('Raw Claude response (first 200 chars):', assistantMessage.substring(0, 200));
+
+      // Clean up the response
+      let cleaned = assistantMessage.trim();
+
+      // We sent { as assistant message (prefill), so Claude continues with the rest
+      // Prepend { to complete the JSON if it doesn't start with {
+      if (!cleaned.startsWith('{')) {
+        cleaned = '{' + cleaned;
+        console.log('Prepended { to complete JSON');
+      }
+
+      // Extract JSON object
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        finalMessage = jsonMatch[0];
-        console.log('Extracted JSON from response');
-      } else {
-        console.warn('No JSON found in generate_proposals response:', assistantMessage);
+        cleaned = jsonMatch[0];
+      }
+
+      finalMessage = cleaned;
+
+      // Validate it's valid JSON
+      try {
+        const parsed = JSON.parse(finalMessage);
+        console.log('JSON validation successful, personas count:', parsed.personas?.length);
+      } catch (e) {
+        console.error('JSON validation failed:', e);
+        console.error('Attempted JSON (first 500 chars):', finalMessage.substring(0, 500));
       }
     }
 
