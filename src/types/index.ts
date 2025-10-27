@@ -86,6 +86,12 @@ export interface Account {
   banned_terms: string[];
   must_include: string[];
   knowledge_base?: string;
+  story?: {
+    hardship?: string;    // 難関・課題
+    solution?: string;    // 救い・商品
+    success?: string;     // 成功・結果
+    [key: string]: unknown;
+  };
   link_policy: {
     utm_template?: string;
     shorten_allowed?: boolean;

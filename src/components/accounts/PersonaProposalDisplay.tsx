@@ -64,51 +64,72 @@ export default function PersonaProposalDisplay({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-700">年齢層:</span>
-                  <span className="ml-2 text-gray-900">{persona.target_age}</span>
-                </div>
+              <div className="space-y-3 text-sm">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="font-medium text-gray-700">年齢層:</span>
+                    <span className="ml-2 text-gray-900">{persona.target_age}</span>
+                  </div>
 
-                <div>
-                  <span className="font-medium text-gray-700">興味・関心:</span>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {persona.interests.map((interest, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-                      >
-                        {interest}
-                      </span>
-                    ))}
+                  <div>
+                    <span className="font-medium text-gray-700">興味・関心:</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {persona.interests.map((interest, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                        >
+                          {interest}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-gray-700">課題・悩み:</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {persona.pain_points.map((point, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded"
+                        >
+                          {point}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-gray-700">提供価値:</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {persona.benefits.map((benefit, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                        >
+                          {benefit}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <span className="font-medium text-gray-700">課題・悩み:</span>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {persona.pain_points.map((point, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded"
-                      >
-                        {point}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <span className="font-medium text-gray-700">提供価値:</span>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {persona.benefits.map((benefit, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
-                      >
-                        {benefit}
-                      </span>
-                    ))}
+                {/* ストーリー */}
+                <div className="border-t pt-3">
+                  <h6 className="font-medium text-gray-700 mb-2">ストーリー（難関→救い→成功）</h6>
+                  <div className="space-y-2">
+                    <div className="bg-red-50 border-l-4 border-red-400 p-2 rounded">
+                      <span className="font-semibold text-red-800 text-xs">難関: </span>
+                      <span className="text-gray-700">{persona.story.hardship}</span>
+                    </div>
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-2 rounded">
+                      <span className="font-semibold text-blue-800 text-xs">救い: </span>
+                      <span className="text-gray-700">{persona.story.solution}</span>
+                    </div>
+                    <div className="bg-green-50 border-l-4 border-green-400 p-2 rounded">
+                      <span className="font-semibold text-green-800 text-xs">成功: </span>
+                      <span className="text-gray-700">{persona.story.success}</span>
+                    </div>
                   </div>
                 </div>
               </div>

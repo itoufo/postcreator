@@ -24,6 +24,9 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
   const [mustInclude, setMustInclude] = useState('');
   const [bannedTerms, setBannedTerms] = useState('');
   const [knowledgeBase, setKnowledgeBase] = useState('');
+  const [hardship, setHardship] = useState('');
+  const [solution, setSolution] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (account) {
@@ -41,6 +44,9 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
       setMustInclude(account.must_include.join(', '));
       setBannedTerms(account.banned_terms.join(', '));
       setKnowledgeBase(account.knowledge_base || '');
+      setHardship(account.story?.hardship || '');
+      setSolution(account.story?.solution || '');
+      setSuccess(account.story?.success || '');
     }
   }, [account]);
 
@@ -97,6 +103,11 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
         must_include: mustInclude.split(',').map((s) => s.trim()).filter(Boolean),
         banned_terms: bannedTerms.split(',').map((s) => s.trim()).filter(Boolean),
         knowledge_base: knowledgeBase,
+        story: {
+          hardship,
+          solution,
+          success,
+        },
         link_policy: {},
       });
     } finally {
@@ -309,6 +320,52 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
                 placeholder="例: 絶対, 確実, 100%"
               />
             </div>
+          </div>
+        </div>
+
+        {/* ストーリー */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-700 mb-3">ストーリー（難関→救い→成功）</h4>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                難関・課題
+              </label>
+              <textarea
+                rows={3}
+                value={hardship}
+                onChange={(e) => setHardship(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 毎日忙しくてスキルアップの時間が取れない、何から始めたらいいかわからない"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                救い・商品（ソリューション）
+              </label>
+              <textarea
+                rows={3}
+                value={solution}
+                onChange={(e) => setSolution(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 1日10分から始められるAI学習アプリ「LearnAI」で、初心者でも無理なく学習できる"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                成功・結果
+              </label>
+              <textarea
+                rows={3}
+                value={success}
+                onChange={(e) => setSuccess(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 3ヶ月後には実務でAIを活用できるようになり、業務効率が2倍に向上"
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              ストーリーは投稿生成時に、共感を生み出すコンテキストとして活用されます
+            </p>
           </div>
         </div>
 

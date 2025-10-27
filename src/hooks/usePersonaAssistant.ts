@@ -12,6 +12,11 @@ export interface PersonaProposal {
   interests: string[];
   pain_points: string[];
   benefits: string[];
+  story: {
+    hardship: string;
+    solution: string;
+    success: string;
+  };
   rationale: string;
 }
 
