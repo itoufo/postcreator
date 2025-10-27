@@ -185,7 +185,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
               max={SNS_PROFILES[sns].max_chars}
               value={maxChars}
               onChange={(e) => setMaxChars(Number(e.target.value))}
-              className="w-full"
+              className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>短め</span>
@@ -216,7 +216,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
                   max={SNS_PROFILES[sns].hashtags.max}
                   value={hashtagMax}
                   onChange={(e) => setHashtagMax(Number(e.target.value))}
-                  className="w-full"
+                  className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
                   <span>少なめ</span>
