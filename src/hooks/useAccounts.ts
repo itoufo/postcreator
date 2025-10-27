@@ -51,6 +51,7 @@ export function useAccounts() {
           banned_terms: account.banned_terms,
           must_include: account.must_include,
           knowledge_base: account.knowledge_base,
+          story: account.story as any,
           link_policy: account.link_policy as any,
         } as any)
         .select()

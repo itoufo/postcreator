@@ -60,7 +60,7 @@ serve(async (req) => {
 - ユーザーの回答に基づいて、より具体的な質問をする
 - 具体例を提示して、ユーザーが答えやすくする
 - ストーリーは共感を生むための重要な要素なので、具体的に引き出す
-- 5-7回のやり取りで十分な情報を集める
+- 3-5回のやり取りで十分な情報を集める
 - 情報が十分に集まったら、「それでは、いくつかペルソナを提案しますね！」と伝え、最後のメッセージに「[READY_FOR_PROPOSALS]」というマーカーを含める
 
 会話は日本語で、フレンドリーかつプロフェッショナルなトーンで行ってください。`;
@@ -97,16 +97,10 @@ serve(async (req) => {
 **ペルソナ作成のガイドライン：**
 - 3つの異なる角度から提案（初心者/中級者/専門家など）
 - 各ペルソナは具体的で実用的に
+- ストーリーは「難関→救い→成功」の流れ
 - 会話から得られた情報を活用
 
-**ストーリーフィールドは必須：**
-- storyフィールドは必ず含めること
-- hardship（難関）: ターゲットが抱える具体的な課題や悩み（2-3文）
-- solution（救い）: 商品・サービスによる解決策（2-3文）
-- success（成功）: 解決後の結果や変化（2-3文）
-- ストーリーは共感を生むための重要な要素なので、必ず詳細に記述すること
-
-**重要：このレスポンスはプログラムが解析するため、JSON以外の一切のテキストを含めないでください。全てのフィールド（特にstory）を必ず含めてください。**`;
+**重要：このレスポンスはプログラムが解析するため、JSON以外の一切のテキストを含めないでください。**`;
     }
 
     // Call Claude API
@@ -133,7 +127,7 @@ serve(async (req) => {
 
     const requestBody = {
       model: "claude-sonnet-4-5",
-      max_tokens: 3000,
+      max_tokens: 10000,
       system: systemPrompt,
       messages: apiMessages,
     };
@@ -172,20 +166,15 @@ serve(async (req) => {
 
     const assistantMessage = data.content[0].text;
 
-    // For generate_proposals, prepend the { we sent and extract JSON
+    // For generate_proposals, extract JSON if wrapped in extra text
     let finalMessage = assistantMessage;
     if (action === 'generate_proposals') {
-      // We sent { as assistant message, so prepend it back
-      finalMessage = '{' + assistantMessage;
-      console.log('Prepended { to complete JSON');
-
-      // Validate it's valid JSON
-      try {
-        JSON.parse(finalMessage);
-        console.log('JSON validation successful');
-      } catch (e) {
-        console.error('JSON validation failed:', e);
-        console.error('Response was:', finalMessage);
+      const jsonMatch = assistantMessage.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        finalMessage = jsonMatch[0];
+        console.log('Extracted JSON from response');
+      } else {
+        console.warn('No JSON found in generate_proposals response:', assistantMessage);
       }
     }
 
