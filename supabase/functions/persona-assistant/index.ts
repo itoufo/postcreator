@@ -47,9 +47,9 @@ serve(async (req) => {
       throw new Error('Messages array is required');
     }
 
-    const claudeApiKey = Deno.env.get('CLAUDE_API_KEY');
+    const claudeApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     if (!claudeApiKey) {
-      throw new Error('CLAUDE_API_KEY not configured');
+      throw new Error('ANTHROPIC_API_KEY not configured');
     }
 
     // Build system prompt based on action
