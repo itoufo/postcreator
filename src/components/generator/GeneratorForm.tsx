@@ -6,9 +6,11 @@ interface GeneratorFormProps {
   accounts: Account[];
   onGenerate: (account: Account, inputs: GenerationInputs) => void;
   loading: boolean;
+  initialAccountId?: string;
+  initialInputs?: GenerationInputs;
 }
 
-export default function GeneratorForm({ accounts, onGenerate, loading }: GeneratorFormProps) {
+export default function GeneratorForm({ accounts, onGenerate, loading, initialAccountId, initialInputs }: GeneratorFormProps) {
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [prompt, setPrompt] = useState('');
   const [baseText, setBaseText] = useState('');
@@ -42,6 +44,36 @@ export default function GeneratorForm({ accounts, onGenerate, loading }: Generat
       setPostType(availableTypes[0] as PostType);
     }
   }, [sns]);
+
+  // 初期値を設定（履歴から編集する場合）
+  useEffect(() => {
+    if (initialAccountId) {
+      setSelectedAccountId(initialAccountId);
+    }
+    if (initialInputs) {
+      setPrompt(initialInputs.prompt || '');
+      setBaseText(initialInputs.base_text || '');
+      setSns(initialInputs.sns);
+      setPostType(initialInputs.post_type);
+      if (initialInputs.options) {
+        if (initialInputs.options.hashtags) {
+          setHashtagsOn(initialInputs.options.hashtags.on);
+          if (initialInputs.options.hashtags.max) {
+            setHashtagMax(initialInputs.options.hashtags.max);
+          }
+        }
+        if (initialInputs.options.max_chars) {
+          setMaxChars(initialInputs.options.max_chars);
+        }
+        if (initialInputs.options.emoji) {
+          setEmojiLevel(initialInputs.options.emoji);
+        }
+        if (initialInputs.options.cta) {
+          setCtaLevel(initialInputs.options.cta);
+        }
+      }
+    }
+  }, [initialAccountId, initialInputs]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

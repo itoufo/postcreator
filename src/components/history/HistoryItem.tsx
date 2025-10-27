@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { GenerationRequest, GenerationResult } from '@/types';
 
 interface HistoryItemProps {
@@ -10,6 +11,7 @@ interface HistoryItemProps {
 export default function HistoryItem({ request, results, onDelete }: HistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
 
   const mainResult = results.find((r) => r.draft);
   const inputs = request.inputs as { prompt: string; sns: string; post_type: string };
@@ -22,6 +24,16 @@ export default function HistoryItem({ request, results, onDelete }: HistoryItemP
     } catch (err) {
       console.error('コピーに失敗しました:', err);
     }
+  };
+
+  const handleEdit = () => {
+    // 履歴データをGeneratorページに渡して遷移
+    navigate('/generator', {
+      state: {
+        accountId: request.account_id,
+        inputs: request.inputs,
+      },
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -118,12 +130,28 @@ export default function HistoryItem({ request, results, onDelete }: HistoryItemP
             <div className="bg-gray-50 rounded-md p-3">
               <div className="flex justify-between items-start mb-2">
                 <h4 className="text-sm font-medium text-gray-700">生成結果</h4>
-                <button
-                  onClick={() => handleCopy(mainResult.draft)}
-                  className="text-xs text-blue-600 hover:text-blue-800"
-                >
-                  {copied ? 'コピー済み ✓' : 'コピー'}
-                </button>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleEdit}
+                    className="text-xs text-green-600 hover:text-green-800 flex items-center space-x-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span>編集</span>
+                  </button>
+                  <button
+                    onClick={() => handleCopy(mainResult.draft)}
+                    className="text-xs text-blue-600 hover:text-blue-800"
+                  >
+                    {copied ? 'コピー済み ✓' : 'コピー'}
+                  </button>
+                </div>
               </div>
               <p className="text-sm text-gray-900 whitespace-pre-wrap">
                 {mainResult.draft}

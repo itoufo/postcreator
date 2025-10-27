@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import Layout from '@/components/common/Layout';
 import GeneratorForm from '@/components/generator/GeneratorForm';
 import ResultDisplay from '@/components/generator/ResultDisplay';
@@ -5,7 +6,14 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useGenerator } from '@/hooks/useGenerator';
 import type { Account, GenerationInputs } from '@/types';
 
+interface LocationState {
+  accountId?: string;
+  inputs?: GenerationInputs;
+}
+
 export default function Generator() {
+  const location = useLocation();
+  const locationState = location.state as LocationState;
   const { accounts, loading: accountsLoading } = useAccounts();
   const { loading, error, result, checks, resultId, currentInputs, generatePost, clearResult } = useGenerator();
 
@@ -92,6 +100,8 @@ export default function Generator() {
                 accounts={accounts}
                 onGenerate={handleGenerate}
                 loading={loading}
+                initialAccountId={locationState?.accountId}
+                initialInputs={locationState?.inputs}
               />
             </div>
             <div>
