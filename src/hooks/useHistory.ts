@@ -33,7 +33,7 @@ export function useHistory() {
 
       // 各リクエストの結果を取得
       const historyItems: HistoryItem[] = [];
-      for (const request of requests) {
+      for (const request of (requests as any[])) {
         const { data: results, error: resultsError } = await supabase
           .from('snsgen_results')
           .select('*')

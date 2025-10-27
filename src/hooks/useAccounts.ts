@@ -43,8 +43,15 @@ export function useAccounts() {
         .from('snsgen_accounts')
         .insert({
           user_id: user.id,
-          ...account,
-        })
+          name: account.name,
+          theme: account.theme,
+          persona: account.persona as any,
+          tone_guidelines: account.tone_guidelines as any,
+          banned_terms: account.banned_terms,
+          must_include: account.must_include,
+          knowledge_base: account.knowledge_base,
+          link_policy: account.link_policy as any,
+        } as any)
         .select()
         .single();
 
@@ -59,16 +66,17 @@ export function useAccounts() {
     }
   };
 
-  const updateAccount = async (id: string, updates: Partial<Account>) => {
+  const updateAccount = async (id: string, updates: Partial<Omit<Account, 'id' | 'user_id' | 'created_at' | 'updated_at'>>) => {
     try {
       setError(null);
 
-      const { data, error: updateError } = await supabase
-        .from('snsgen_accounts')
+      const queryResult: any = await (supabase.from('snsgen_accounts') as any)
         .update(updates)
         .eq('id', id)
         .select()
         .single();
+
+      const { data, error: updateError } = queryResult;
 
       if (updateError) throw updateError;
 

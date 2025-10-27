@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Account } from '@/types';
-import { TONE_GUIDELINE_SAMPLES, PERSONA_SAMPLES } from '@/lib/constants';
+import { PERSONA_SAMPLES } from '@/lib/constants';
 
 interface AccountFormProps {
   account?: Account | null;

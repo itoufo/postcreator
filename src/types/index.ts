@@ -210,14 +210,17 @@ export interface Dictionary {
   updated_at: string;
 }
 
+// 生成された投稿文の結果
+export interface GeneratedPostResults {
+  main: string;
+  alt1: string;
+  alt2: string;
+  short_main: string;
+  hashtags: string[];
+}
+
 // Edge Function レスポンス
 export interface GeneratePostResponse {
   request_id: string;
-  results: {
-    main: string;
-    alt1: string;
-    alt2: string;
-    short_main: string;
-    hashtags: string[];
-  };
+  results: GeneratedPostResults;
 }

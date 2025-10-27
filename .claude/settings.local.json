@@ -6,7 +6,10 @@
       "Bash(mkdir:*)",
       "Bash(sed:*)",
       "Bash(npx supabase functions deploy)",
-      "Bash(npx supabase:*)"
+      "Bash(npx supabase:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { Account, GenerationInputs, GeneratePostResponse, QualityChecks } from '@/types';
+import type { Account, GenerationInputs, GeneratedPostResults, QualityChecks } from '@/types';
 
 export function useGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<GeneratePostResponse | null>(null);
+  const [result, setResult] = useState<GeneratedPostResults | null>(null);
   const [checks, setChecks] = useState<QualityChecks | null>(null);
 
   const generatePost = async (account: Account, inputs: GenerationInputs) => {
@@ -24,13 +24,16 @@ export function useGenerator() {
         .insert({
           user_id: user.id,
           account_id: account.id,
-          inputs,
-          status: 'processing',
-        })
+          inputs: inputs as any,
+          status: 'processing' as const,
+        } as any)
         .select()
         .single();
 
       if (requestError) throw requestError;
+      if (!requestData) throw new Error('リクエストの作成に失敗しました');
+
+      const typedRequestData = requestData as any;
 
       // 2. Edge Function を呼び出し
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -43,7 +46,7 @@ export function useGenerator() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          request_id: requestData.id,
+          request_id: typedRequestData.id,
           account,
           inputs,
         }),
@@ -59,17 +62,16 @@ export function useGenerator() {
       setChecks(data.checks);
 
       // 3. リクエストステータスを更新
-      await supabase
-        .from('snsgen_requests')
+      await (supabase.from('snsgen_requests') as any)
         .update({
-          status: 'completed',
+          status: 'completed' as const,
           completed_at: new Date().toISOString(),
         })
-        .eq('id', requestData.id);
+        .eq('id', typedRequestData.id);
 
       // 4. 結果を保存
       await supabase.from('snsgen_results').insert({
-        request_id: requestData.id,
+        request_id: typedRequestData.id,
         sns: inputs.sns,
         post_type: inputs.post_type,
         draft: data.results.main,
@@ -77,10 +79,10 @@ export function useGenerator() {
           alt1: data.results.alt1,
           alt2: data.results.alt2,
           short_main: data.results.short_main,
-        },
+        } as any,
         hashtags: data.results.hashtags || [],
-        checks: data.checks || {},
-      });
+        checks: data.checks || {} as any,
+      } as any);
 
       return { data: data.results, error: null };
     } catch (err) {

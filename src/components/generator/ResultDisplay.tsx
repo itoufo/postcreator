@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import type { GeneratePostResponse, QualityChecks } from '@/types';
+import type { GeneratedPostResults, QualityChecks } from '@/types';
 
 interface ResultDisplayProps {
-  result: GeneratePostResponse;
+  result: GeneratedPostResults;
   checks: QualityChecks | null;
   onClear: () => void;
 }
