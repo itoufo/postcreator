@@ -175,7 +175,7 @@ export default function PersonaAssistant({ onClose, onApprovePersonas }: Persona
                     onKeyPress={handleKeyPress}
                     placeholder="メッセージを入力..."
                     disabled={loading}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                   />
                   <button
                     onClick={handleSend}
