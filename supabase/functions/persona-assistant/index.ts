@@ -104,14 +104,35 @@ serve(async (req) => {
     }
 
     // Call Claude API
+    let apiMessages = messages;
+
+    // For generate_proposals, create a single summarized message
+    if (action === 'generate_proposals') {
+      // Extract all user responses from conversation
+      const conversationSummary = messages
+        .map((msg, idx) => `${idx + 1}. ${msg.role === 'user' ? 'ユーザー' : 'AI'}: ${msg.content}`)
+        .join('\n');
+
+      apiMessages = [
+        {
+          role: 'user',
+          content: `以下の会話履歴から3つのペルソナをJSON形式で生成してください：\n\n${conversationSummary}\n\nJSON形式で出力してください。説明は不要です。`,
+        },
+        {
+          role: 'assistant',
+          content: '{',
+        },
+      ];
+    }
+
     const requestBody = {
       model: "claude-sonnet-4-5",
       max_tokens: 3000,
       system: systemPrompt,
-      messages: messages,
+      messages: apiMessages,
     };
 
-    console.log('Claude API request:', JSON.stringify(requestBody, null, 2));
+    console.log('Claude API request (action: ' + action + '):', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -145,15 +166,20 @@ serve(async (req) => {
 
     const assistantMessage = data.content[0].text;
 
-    // For generate_proposals, extract JSON if wrapped in extra text
+    // For generate_proposals, prepend the { we sent and extract JSON
     let finalMessage = assistantMessage;
     if (action === 'generate_proposals') {
-      const jsonMatch = assistantMessage.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        finalMessage = jsonMatch[0];
-        console.log('Extracted JSON from response');
-      } else {
-        console.warn('No JSON found in generate_proposals response:', assistantMessage);
+      // We sent { as assistant message, so prepend it back
+      finalMessage = '{' + assistantMessage;
+      console.log('Prepended { to complete JSON');
+
+      // Validate it's valid JSON
+      try {
+        JSON.parse(finalMessage);
+        console.log('JSON validation successful');
+      } catch (e) {
+        console.error('JSON validation failed:', e);
+        console.error('Response was:', finalMessage);
       }
     }
 
