@@ -168,19 +168,19 @@ export default function PersonaAssistant({ onClose, onApprovePersonas }: Persona
                 </div>
               ) : (
                 <div className="flex space-x-3">
-                  <input
-                    type="text"
+                  <textarea
+                    rows={3}
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="メッセージを入力..."
+                    placeholder="メッセージを入力...（Enter: 送信、Shift+Enter: 改行）"
                     disabled={loading}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 resize-none"
                   />
                   <button
                     onClick={handleSend}
                     disabled={loading || !userInput.trim()}
-                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed self-end"
                   >
                     送信
                   </button>
