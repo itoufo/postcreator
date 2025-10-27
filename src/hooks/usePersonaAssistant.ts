@@ -41,10 +41,12 @@ export function usePersonaAssistant() {
       }
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       const response = await fetch(`${supabaseUrl}/functions/v1/persona-assistant`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
+          'apikey': supabaseAnonKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -93,10 +95,12 @@ export function usePersonaAssistant() {
       }
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       const response = await fetch(`${supabaseUrl}/functions/v1/persona-assistant`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
+          'apikey': supabaseAnonKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -152,10 +156,12 @@ export function usePersonaAssistant() {
       }
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       const response = await fetch(`${supabaseUrl}/functions/v1/persona-assistant`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
+          'apikey': supabaseAnonKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
