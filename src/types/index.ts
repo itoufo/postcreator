@@ -85,6 +85,7 @@ export interface Account {
       success?: string;     // 成功・結果
     };
     positioning?: string;   // ポジショニング
+    stance?: string;        // スタンス（優しい、煽る、厳しい、応援する、など）
     [key: string]: unknown;
   };
   tone_guidelines: {

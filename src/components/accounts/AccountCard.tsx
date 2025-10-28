@@ -74,6 +74,12 @@ export default function AccountCard({ account, onEdit, onDelete }: AccountCardPr
             <span className="text-gray-900">{account.persona.target_age}</span>
           </div>
         )}
+        {account.account_design?.stance && (
+          <div className="flex items-center">
+            <span className="text-gray-500 w-24">スタンス:</span>
+            <span className="text-gray-900">{account.account_design.stance}</span>
+          </div>
+        )}
         {account.account_design?.story?.hardship && (
           <div className="flex items-start">
             <span className="text-gray-500 w-24">ストーリー:</span>

@@ -27,6 +27,7 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
   const [hardship, setHardship] = useState('');
   const [solution, setSolution] = useState('');
   const [success, setSuccess] = useState('');
+  const [stance, setStance] = useState('');
 
   useEffect(() => {
     if (account) {
@@ -47,6 +48,7 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
       setHardship(account.account_design?.story?.hardship || '');
       setSolution(account.account_design?.story?.solution || '');
       setSuccess(account.account_design?.story?.success || '');
+      setStance(account.account_design?.stance || '');
     }
   }, [account]);
 
@@ -109,6 +111,7 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
             solution,
             success,
           },
+          stance,
         },
         link_policy: {},
       });
@@ -332,6 +335,21 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
             ペルソナに響かせるためのストーリー、ポジショニング、メッセージング戦略を設定します
           </p>
           <div className="space-y-3">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1 font-medium">
+                スタンス
+              </label>
+              <input
+                type="text"
+                value={stance}
+                onChange={(e) => setStance(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 優しく寄り添う、背中を押す、厳しく応援、ユーモア交え、熱く煽る"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                ペルソナに対する態度・スタンス（優しい、煽る、厳しい、応援する、など）
+              </p>
+            </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1 font-medium">
                 ストーリー: 難関・課題
