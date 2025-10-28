@@ -74,18 +74,18 @@ export default function AccountCard({ account, onEdit, onDelete }: AccountCardPr
             <span className="text-gray-900">{account.persona.target_age}</span>
           </div>
         )}
-        {account.story?.hardship && (
+        {account.account_design?.story?.hardship && (
           <div className="flex items-start">
             <span className="text-gray-500 w-24">ストーリー:</span>
             <div className="text-gray-900 text-xs">
               <div className="mb-1">
                 <span className="font-semibold text-red-700">難関: </span>
-                <span>{account.story.hardship.substring(0, 50)}{account.story.hardship.length > 50 ? '...' : ''}</span>
+                <span>{account.account_design.story.hardship.substring(0, 50)}{account.account_design.story.hardship.length > 50 ? '...' : ''}</span>
               </div>
-              {account.story.success && (
+              {account.account_design.story.success && (
                 <div>
                   <span className="font-semibold text-green-700">成功: </span>
-                  <span>{account.story.success.substring(0, 50)}{account.story.success.length > 50 ? '...' : ''}</span>
+                  <span>{account.account_design.story.success.substring(0, 50)}{account.account_design.story.success.length > 50 ? '...' : ''}</span>
                 </div>
               )}
             </div>

@@ -69,11 +69,22 @@ export interface Account {
   name: string;
   default_sns: SNSType;
   theme?: string;
+  // ペルソナ情報（ターゲット層の特徴）
   persona: {
     target_age?: string;
     interests?: string[];
     pain_points?: string[];
     benefits?: string[];
+    [key: string]: unknown;
+  };
+  // アカウント設計（ペルソナにヒットさせるための戦略）
+  account_design?: {
+    story?: {
+      hardship?: string;    // 難関・課題
+      solution?: string;    // 救い・商品
+      success?: string;     // 成功・結果
+    };
+    positioning?: string;   // ポジショニング
     [key: string]: unknown;
   };
   tone_guidelines: {
@@ -86,12 +97,6 @@ export interface Account {
   banned_terms: string[];
   must_include: string[];
   knowledge_base?: string;
-  story?: {
-    hardship?: string;    // 難関・課題
-    solution?: string;    // 救い・商品
-    success?: string;     // 成功・結果
-    [key: string]: unknown;
-  };
   link_policy: {
     utm_template?: string;
     shorten_allowed?: boolean;

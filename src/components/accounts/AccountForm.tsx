@@ -44,9 +44,9 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
       setMustInclude(account.must_include.join(', '));
       setBannedTerms(account.banned_terms.join(', '));
       setKnowledgeBase(account.knowledge_base || '');
-      setHardship(account.story?.hardship || '');
-      setSolution(account.story?.solution || '');
-      setSuccess(account.story?.success || '');
+      setHardship(account.account_design?.story?.hardship || '');
+      setSolution(account.account_design?.story?.solution || '');
+      setSuccess(account.account_design?.story?.success || '');
     }
   }, [account]);
 
@@ -103,10 +103,12 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
         must_include: mustInclude.split(',').map((s) => s.trim()).filter(Boolean),
         banned_terms: bannedTerms.split(',').map((s) => s.trim()).filter(Boolean),
         knowledge_base: knowledgeBase,
-        story: {
-          hardship,
-          solution,
-          success,
+        account_design: {
+          story: {
+            hardship,
+            solution,
+            success,
+          },
         },
         link_policy: {},
       });
@@ -173,10 +175,10 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
           </div>
         </div>
 
-        {/* ペルソナ */}
+        {/* ペルソナ情報 */}
         <div>
           <div className="flex justify-between items-center mb-3">
-            <h4 className="text-sm font-medium text-gray-700">ターゲットペルソナ</h4>
+            <h4 className="text-sm font-medium text-gray-700">ペルソナ情報（ターゲット層の特徴）</h4>
             <select
               onChange={(e) => applyPersonaSample(e.target.value)}
               className="text-xs px-2 py-1 border border-gray-300 rounded"
@@ -323,48 +325,51 @@ export default function AccountForm({ account, onSave, onCancel }: AccountFormPr
           </div>
         </div>
 
-        {/* ストーリー */}
+        {/* アカウント設計 */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-3">ストーリー（難関→救い→成功）</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">アカウント設計（ペルソナにヒットさせる戦略）</h4>
+          <p className="text-xs text-gray-500 mb-3">
+            ペルソナに響かせるためのストーリー、ポジショニング、メッセージング戦略を設定します
+          </p>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                難関・課題
+              <label className="block text-sm text-gray-600 mb-1 font-medium">
+                ストーリー: 難関・課題
               </label>
               <textarea
                 rows={3}
                 value={hardship}
                 onChange={(e) => setHardship(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="例: 毎日忙しくてスキルアップの時間が取れない、何から始めたらいいかわからない"
+                placeholder="ペルソナが抱える難関や課題を具体的に記述&#10;例: 毎日忙しくてスキルアップの時間が取れない、何から始めたらいいかわからない"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                救い・商品（ソリューション）
+              <label className="block text-sm text-gray-600 mb-1 font-medium">
+                ストーリー: 救い・商品（ソリューション）
               </label>
               <textarea
                 rows={3}
                 value={solution}
                 onChange={(e) => setSolution(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="例: 1日10分から始められるAI学習アプリ「LearnAI」で、初心者でも無理なく学習できる"
+                placeholder="あなたの商品・サービスがどう解決するか&#10;例: 1日10分から始められるAI学習アプリ「LearnAI」で、初心者でも無理なく学習できる"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                成功・結果
+              <label className="block text-sm text-gray-600 mb-1 font-medium">
+                ストーリー: 成功・結果
               </label>
               <textarea
                 rows={3}
                 value={success}
                 onChange={(e) => setSuccess(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="例: 3ヶ月後には実務でAIを活用できるようになり、業務効率が2倍に向上"
+                placeholder="利用後にペルソナが得られる成功・結果&#10;例: 3ヶ月後には実務でAIを活用できるようになり、業務効率が2倍に向上"
               />
             </div>
-            <p className="text-xs text-gray-500">
-              ストーリーは投稿生成時に、共感を生み出すコンテキストとして活用されます
+            <p className="text-xs text-gray-500 bg-blue-50 border border-blue-200 rounded p-2">
+              💡 このストーリー（難関→救い→成功）は投稿生成時に活用され、ペルソナの共感を生み出します
             </p>
           </div>
         </div>
