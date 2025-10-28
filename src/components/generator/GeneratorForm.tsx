@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { Account, SNSType, PostType, GenerationInputs } from '@/types';
-import { SNS_PROFILES, SNS_POST_TYPES, EMOJI_LEVEL_DESCRIPTIONS, CTA_LEVEL_DESCRIPTIONS } from '@/lib/constants';
+import type { Account, SNSType, PostType, PostContentType, GenerationInputs } from '@/types';
+import { SNS_PROFILES, SNS_POST_TYPES, EMOJI_LEVEL_DESCRIPTIONS, CTA_LEVEL_DESCRIPTIONS, CONTENT_TYPE_DESCRIPTIONS } from '@/lib/constants';
 
 interface GeneratorFormProps {
   accounts: Account[];
@@ -16,6 +16,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading, initialAc
   const [baseText, setBaseText] = useState('');
   const [sns, setSns] = useState<SNSType>('X');
   const [postType, setPostType] = useState<PostType>('normal');
+  const [contentType, setContentType] = useState<PostContentType | ''>('');
   const [maxChars, setMaxChars] = useState(280);
   const [hashtagsOn, setHashtagsOn] = useState(true);
   const [hashtagMax, setHashtagMax] = useState(5);
@@ -55,6 +56,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading, initialAc
       setBaseText(initialInputs.base_text || '');
       setSns(initialInputs.sns);
       setPostType(initialInputs.post_type);
+      setContentType(initialInputs.content_type || '');
       if (initialInputs.options) {
         if (initialInputs.options.hashtags) {
           setHashtagsOn(initialInputs.options.hashtags.on);
@@ -89,6 +91,7 @@ export default function GeneratorForm({ accounts, onGenerate, loading, initialAc
       base_text: baseText || undefined,
       sns,
       post_type: postType,
+      content_type: contentType || undefined,
       options: {
         hashtags: {
           on: hashtagsOn,
@@ -172,6 +175,28 @@ export default function GeneratorForm({ accounts, onGenerate, loading, initialAc
             ))}
           </select>
         </div>
+      </div>
+
+      {/* 投稿内容タイプ */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          投稿内容タイプ（任意）
+        </label>
+        <select
+          value={contentType}
+          onChange={(e) => setContentType(e.target.value as PostContentType | '')}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">指定なし</option>
+          {Object.entries(CONTENT_TYPE_DESCRIPTIONS).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-gray-500">
+          投稿のアプローチ方法を指定すると、より戦略的なコンテンツが生成されます
+        </p>
       </div>
 
       {/* プロンプト */}

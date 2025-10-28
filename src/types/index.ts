@@ -3,7 +3,7 @@
 // SNS種別
 export type SNSType = 'X' | 'Instagram' | 'Threads' | 'note';
 
-// 投稿種別
+// 投稿種別（フォーマット）
 export type PostType =
   | 'normal'      // 通常投稿
   | 'thread'      // スレッド
@@ -13,6 +13,17 @@ export type PostType =
   | 'carousel'    // カルーセル
   | 'article'     // 記事（note）
   | 'snippet';    // つぶやき（note）
+
+// 投稿内容タイプ（コンテンツの性質）
+export type PostContentType =
+  | 'contrast'      // 対立型：常識否定、逆張り、仮想敵設定
+  | 'authority'     // 権威構築型：実績アピール、専門性提示
+  | 'value'         // 価値提供型：ノウハウ、Tips、教育
+  | 'empathy'       // 共感型：あるある、悩み共有
+  | 'insight'       // 洞察型：哲学、本質、深い気づき
+  | 'story'         // ストーリー型：体験談、変化の物語
+  | 'question'      // 問いかけ型：質問、対話促進
+  | 'achievement';  // 結果公開型：数字、実績、証拠
 
 // 絵文字使用レベル
 export type EmojiLevel = 'none' | 'light' | 'moderate' | 'heavy';
@@ -155,6 +166,7 @@ export interface GenerationInputs {
   base_text?: string;
   sns: SNSType;
   post_type: PostType;
+  content_type?: PostContentType;
   options?: GenerationOptions;
 }
 

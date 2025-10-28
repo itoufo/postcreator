@@ -94,6 +94,18 @@ export const CTA_LEVEL_DESCRIPTIONS = {
   strong: '強（例：今すぐチェック！）',
 };
 
+// 投稿内容タイプの説明
+export const CONTENT_TYPE_DESCRIPTIONS = {
+  contrast: '対立型 - 常識否定、逆張り、仮想敵設定で注目を集める',
+  authority: '権威構築型 - 実績・専門性をアピールして信頼を得る',
+  value: '価値提供型 - ノウハウ・Tips・教育的コンテンツで役立つ',
+  empathy: '共感型 - あるある・悩み共有で寄り添う',
+  insight: '洞察型 - 哲学・本質・深い気づきで考えさせる',
+  story: 'ストーリー型 - 体験談・変化の物語で引き込む',
+  question: '問いかけ型 - 質問・対話でエンゲージメント促進',
+  achievement: '結果公開型 - 数字・実績・証拠で説得力を持たせる',
+};
+
 // ハッシュタグ位置の説明
 export const HASHTAG_POSITION_DESCRIPTIONS = {
   end: '末尾',
