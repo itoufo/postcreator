@@ -108,7 +108,7 @@ async function callClaude(system: string, user: string): Promise<ClaudeResponse>
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
       system,
-      max_tokens: 1024,
+      max_tokens: 20000,
       temperature: 0.7,
       messages: [{ role: "user", content: user }],
     }),
@@ -124,10 +124,10 @@ async function callClaude(system: string, user: string): Promise<ClaudeResponse>
 
 // JSON抽出（```json...```やテキストから）
 function extractJSON(text: string): unknown {
-  // まず ```json で囲まれたブロックを探す
-  const jsonBlockMatch = text.match(/```json\s*\n([\s\S]*?)\n```/);
+  // まず ```json で囲まれたブロックを探す（より柔軟に）
+  const jsonBlockMatch = text.match(/```json\s*([\s\S]*?)```/);
   if (jsonBlockMatch) {
-    return JSON.parse(jsonBlockMatch[1]);
+    return JSON.parse(jsonBlockMatch[1].trim());
   }
 
   // 次に { ... } の形式を探す
