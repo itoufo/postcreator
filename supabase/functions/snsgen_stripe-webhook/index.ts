@@ -35,6 +35,16 @@ serve(async (req) => {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+
+        // メタデータのバリデーション
+        if (session.metadata?.service !== 'postcreator') {
+          console.log('Skipping non-postcreator checkout session')
+          return new Response(JSON.stringify({ received: true, skipped: true }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200,
+          })
+        }
+
         const customerId = session.customer as string
         const subscriptionId = session.subscription as string
 
@@ -132,6 +142,16 @@ PostCreator運営チーム
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
+
+        // メタデータのバリデーション
+        if (subscription.metadata?.service !== 'postcreator') {
+          console.log('Skipping non-postcreator subscription event')
+          return new Response(JSON.stringify({ received: true, skipped: true }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200,
+          })
+        }
+
         const customerId = subscription.customer as string
         const priceId = subscription.items.data[0].price.id
 
@@ -221,6 +241,16 @@ PostCreator運営チーム
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
+
+        // メタデータのバリデーション
+        if (subscription.metadata?.service !== 'postcreator') {
+          console.log('Skipping non-postcreator subscription deletion')
+          return new Response(JSON.stringify({ received: true, skipped: true }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200,
+          })
+        }
+
         const customerId = subscription.customer as string
 
         // フリープランに戻す
@@ -344,6 +374,16 @@ PostCreator運営チーム
 
       case 'customer.subscription.trial_will_end': {
         const subscription = event.data.object as Stripe.Subscription
+
+        // メタデータのバリデーション
+        if (subscription.metadata?.service !== 'postcreator') {
+          console.log('Skipping non-postcreator trial event')
+          return new Response(JSON.stringify({ received: true, skipped: true }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: 200,
+          })
+        }
+
         const customerId = subscription.customer as string
 
         // トライアル終了通知メール

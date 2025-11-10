@@ -85,8 +85,13 @@ serve(async (req) => {
       mode: 'subscription',
       success_url: successUrl,
       cancel_url: cancelUrl,
+      metadata: {
+        service: 'postcreator',
+        supabase_user_id: user.id,
+      },
       subscription_data: {
         metadata: {
+          service: 'postcreator',
           supabase_user_id: user.id,
         },
       },
