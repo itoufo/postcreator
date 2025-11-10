@@ -1,7 +1,12 @@
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
+
 export default function Privacy() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header />
+      <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">プライバシーポリシー</h1>
 
         <div className="space-y-6 text-gray-700">
@@ -118,7 +123,9 @@ export default function Privacy() {
             <p className="text-sm text-gray-500">最終更新日: 2025年1月30日</p>
           </section>
         </div>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }
