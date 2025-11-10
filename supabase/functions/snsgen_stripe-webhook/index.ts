@@ -41,16 +41,20 @@ serve(async (req) => {
 
         // プランタイプを価格IDから判定
         let planType = 'free'
+        let planName = 'Free'
         if (priceId === Deno.env.get('SNSGEN_STRIPE_BASIC_PRICE_ID')) {
           planType = 'basic'
+          planName = 'Basic'
         } else if (priceId === Deno.env.get('SNSGEN_STRIPE_PRO_PRICE_ID')) {
           planType = 'pro'
+          planName = 'Pro'
         } else if (priceId === Deno.env.get('SNSGEN_STRIPE_ENTERPRISE_PRICE_ID')) {
           planType = 'enterprise'
+          planName = 'Enterprise'
         }
 
         // サブスクリプション情報を更新
-        const { error } = await supabase
+        const { data: subData, error } = await supabase
           .from('snsgen_subscriptions')
           .update({
             plan_type: planType,
@@ -63,8 +67,59 @@ serve(async (req) => {
             canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
           })
           .eq('stripe_customer_id', customerId)
+          .select('user_id')
+          .single()
 
         if (error) throw error
+
+        // サブスクリプション作成時のみメール送信
+        if (event.type === 'customer.subscription.created' && subData) {
+          // ユーザー情報を取得
+          const { data: userData } = await supabase.auth.admin.getUserById(subData.user_id)
+
+          if (userData?.user?.email) {
+            const periodEnd = new Date(subscription.current_period_end * 1000).toLocaleDateString('ja-JP')
+
+            // Supabaseのメール送信機能を使用
+            await supabase.auth.admin.generateLink({
+              type: 'email',
+              email: userData.user.email,
+              options: {
+                redirectTo: `${Deno.env.get('SITE_URL')}/subscription`
+              }
+            })
+
+            // カスタムメール送信（Resendなどを使用する場合）
+            const emailSubject = `【PostCreator】${planName}プランへのご登録ありがとうございます`
+            const emailBody = `
+PostCreatorをご利用いただきありがとうございます。
+
+${planName}プランへのご登録が完了しました。
+
+■ サブスクリプション情報
+- プラン: ${planName}
+- ステータス: アクティブ
+- 次回更新日: ${periodEnd}
+
+サブスクリプションの詳細は、以下のページからご確認いただけます：
+${Deno.env.get('SITE_URL')}/subscription
+
+ご不明な点がございましたら、お気軽にお問い合わせください。
+
+---
+PostCreator運営チーム
+株式会社ウォーカー 新人類育成計画/BizITCo
+            `.trim()
+
+            console.log(`Subscription created email would be sent to: ${userData.user.email}`)
+            console.log(`Subject: ${emailSubject}`)
+            console.log(`Body: ${emailBody}`)
+
+            // 実際のメール送信は環境変数でResend APIキーなどが設定されている場合のみ
+            // TODO: Resend等のメールサービスと統合
+          }
+        }
+
         break
       }
 
@@ -73,7 +128,7 @@ serve(async (req) => {
         const customerId = subscription.customer as string
 
         // フリープランに戻す
-        const { error } = await supabase
+        const { data: subData, error } = await supabase
           .from('snsgen_subscriptions')
           .update({
             plan_type: 'free',
@@ -81,8 +136,39 @@ serve(async (req) => {
             canceled_at: new Date().toISOString(),
           })
           .eq('stripe_customer_id', customerId)
+          .select('user_id')
+          .single()
 
         if (error) throw error
+
+        // キャンセル通知メール
+        if (subData) {
+          const { data: userData } = await supabase.auth.admin.getUserById(subData.user_id)
+
+          if (userData?.user?.email) {
+            const emailSubject = '【PostCreator】サブスクリプションがキャンセルされました'
+            const emailBody = `
+PostCreatorをご利用いただきありがとうございます。
+
+サブスクリプションがキャンセルされ、Freeプランに変更されました。
+
+引き続きFreeプランの機能はご利用いただけます。
+再度有料プランにアップグレードされる場合は、以下のページからお手続きください：
+${Deno.env.get('SITE_URL')}/subscription
+
+今後ともPostCreatorをよろしくお願いいたします。
+
+---
+PostCreator運営チーム
+株式会社ウォーカー 新人類育成計画/BizITCo
+            `.trim()
+
+            console.log(`Subscription canceled email would be sent to: ${userData.user.email}`)
+            console.log(`Subject: ${emailSubject}`)
+            console.log(`Body: ${emailBody}`)
+          }
+        }
+
         break
       }
 
@@ -106,14 +192,45 @@ serve(async (req) => {
         const invoice = event.data.object as Stripe.Invoice
         const customerId = invoice.customer as string
 
-        const { error } = await supabase
+        const { data: subData, error } = await supabase
           .from('snsgen_subscriptions')
           .update({
             status: 'past_due',
           })
           .eq('stripe_customer_id', customerId)
+          .select('user_id')
+          .single()
 
         if (error) throw error
+
+        // 支払い失敗通知メール
+        if (subData) {
+          const { data: userData } = await supabase.auth.admin.getUserById(subData.user_id)
+
+          if (userData?.user?.email) {
+            const emailSubject = '【PostCreator】お支払いが失敗しました'
+            const emailBody = `
+PostCreatorをご利用いただきありがとうございます。
+
+サブスクリプションの支払い処理が失敗しました。
+
+お支払い方法をご確認いただき、更新をお願いいたします。
+以下のページから支払い方法を更新できます：
+${Deno.env.get('SITE_URL')}/subscription
+
+お支払いが確認できない場合、サービスのご利用が制限される可能性がございます。
+
+---
+PostCreator運営チーム
+株式会社ウォーカー 新人類育成計画/BizITCo
+            `.trim()
+
+            console.log(`Payment failed email would be sent to: ${userData.user.email}`)
+            console.log(`Subject: ${emailSubject}`)
+            console.log(`Body: ${emailBody}`)
+          }
+        }
+
         break
       }
 
@@ -137,8 +254,43 @@ serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
 
-        // トライアル終了3日前の通知（ログのみ、必要に応じてメール送信など）
-        console.log(`Trial ending soon for customer: ${customerId}`)
+        // トライアル終了通知メール
+        const { data: subData } = await supabase
+          .from('snsgen_subscriptions')
+          .select('user_id, plan_type')
+          .eq('stripe_customer_id', customerId)
+          .single()
+
+        if (subData) {
+          const { data: userData } = await supabase.auth.admin.getUserById(subData.user_id)
+          const trialEndDate = new Date(subscription.trial_end! * 1000).toLocaleDateString('ja-JP')
+
+          if (userData?.user?.email) {
+            const emailSubject = '【PostCreator】トライアル期間終了のお知らせ'
+            const emailBody = `
+PostCreatorをご利用いただきありがとうございます。
+
+トライアル期間が間もなく終了します。
+
+■ トライアル終了日: ${trialEndDate}
+
+トライアル期間終了後は、自動的に有料プランへ移行します。
+継続をご希望されない場合は、以下のページからキャンセルできます：
+${Deno.env.get('SITE_URL')}/subscription
+
+引き続きPostCreatorをご利用いただけますと幸いです。
+
+---
+PostCreator運営チーム
+株式会社ウォーカー 新人類育成計画/BizITCo
+            `.trim()
+
+            console.log(`Trial ending email would be sent to: ${userData.user.email}`)
+            console.log(`Subject: ${emailSubject}`)
+            console.log(`Body: ${emailBody}`)
+          }
+        }
+
         break
       }
 
