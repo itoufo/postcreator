@@ -56,26 +56,40 @@ serve(async (req) => {
           planName = 'Enterprise'
         }
 
-        // stripe_customer_idでユーザーのサブスクリプション情報を更新
-        const { data: subData, error } = await supabase
+        // stripe_customer_idでユーザーのサブスクリプション情報を検索
+        const { data: existingSubData } = await supabase
           .from('snsgen_subscriptions')
-          .update({
-            plan_type: planType,
-            status: subscription.status,
-            stripe_subscription_id: subscription.id,
-            stripe_price_id: priceId,
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-            cancel_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
-            canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
-          })
-          .eq('stripe_customer_id', customerId)
           .select('user_id')
-          .single()
+          .eq('stripe_customer_id', customerId)
+          .maybeSingle()
 
-        if (error) {
-          console.error('Error updating subscription:', error)
-          throw error
+        let subData = existingSubData
+
+        if (existingSubData) {
+          // 既存のサブスクリプション情報を更新
+          const { data: updatedData, error } = await supabase
+            .from('snsgen_subscriptions')
+            .update({
+              plan_type: planType,
+              status: subscription.status,
+              stripe_subscription_id: subscription.id,
+              stripe_price_id: priceId,
+              current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              cancel_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
+              canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
+            })
+            .eq('stripe_customer_id', customerId)
+            .select('user_id')
+            .single()
+
+          if (error) {
+            console.error('Error updating subscription:', error)
+            throw error
+          }
+          subData = updatedData
+        } else {
+          console.log(`No subscription found for customer ${customerId}, skipping update`)
         }
 
         // ウェルカムメール送信
@@ -150,7 +164,7 @@ PostCreator運営チーム
           })
           .eq('stripe_customer_id', customerId)
           .select('user_id')
-          .single()
+          .maybeSingle()
 
         if (error) throw error
 
@@ -219,7 +233,7 @@ PostCreator運営チーム
           })
           .eq('stripe_customer_id', customerId)
           .select('user_id')
-          .single()
+          .maybeSingle()
 
         if (error) throw error
 
@@ -265,8 +279,6 @@ PostCreator運営チーム
             status: 'active',
           })
           .eq('stripe_customer_id', customerId)
-
-        if (error) throw error
         break
       }
 
@@ -281,7 +293,7 @@ PostCreator運営チーム
           })
           .eq('stripe_customer_id', customerId)
           .select('user_id')
-          .single()
+          .maybeSingle()
 
         if (error) throw error
 
@@ -321,14 +333,12 @@ PostCreator運営チーム
         const customerId = invoice.customer as string
 
         // 追加認証が必要な場合
-        const { error } = await supabase
+        await supabase
           .from('snsgen_subscriptions')
           .update({
             status: 'past_due',
           })
           .eq('stripe_customer_id', customerId)
-
-        if (error) throw error
         break
       }
 
