@@ -37,6 +37,9 @@
 3. エンドポイントURL: `https://<your-project-ref>.supabase.co/functions/v1/snsgen_stripe-webhook`
 4. 「イベントを選択」で以下を選択:
 
+   **必須イベント（Checkout events）**
+   - `checkout.session.completed` - チェックアウト完了時（最重要）
+
    **必須イベント（Customer events）**
    - `customer.subscription.created` - サブスクリプション作成時
    - `customer.subscription.updated` - サブスクリプション更新時（プラン変更、更新日変更など）
@@ -44,13 +47,11 @@
 
    **必須イベント（Billing events）**
    - `invoice.payment_failed` - 請求失敗時（支払いエラー）
-   - `invoice.payment_succeeded` - 請求成功時（推奨）
+   - `invoice.payment_succeeded` - 請求成功時
 
    **推奨イベント（オプション）**
    - `customer.subscription.trial_will_end` - トライアル期間終了3日前
    - `invoice.payment_action_required` - 追加認証（3Dセキュアなど）が必要な場合
-   - `checkout.session.completed` - チェックアウト完了時
-   - `payment_intent.payment_failed` - 決済失敗時
 
 5. 「エンドポイントを追加」をクリック
 6. Webhook署名シークレット（`whsec_`で始まる文字列）をコピーして保存

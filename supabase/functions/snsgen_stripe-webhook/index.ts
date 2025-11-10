@@ -33,6 +33,88 @@ serve(async (req) => {
     )
 
     switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        const customerId = session.customer as string
+        const subscriptionId = session.subscription as string
+
+        // サブスクリプション情報を取得
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const priceId = subscription.items.data[0].price.id
+
+        // プランタイプを価格IDから判定
+        let planType = 'free'
+        let planName = 'Free'
+        if (priceId === Deno.env.get('SNSGEN_STRIPE_BASIC_PRICE_ID')) {
+          planType = 'basic'
+          planName = 'Basic'
+        } else if (priceId === Deno.env.get('SNSGEN_STRIPE_PRO_PRICE_ID')) {
+          planType = 'pro'
+          planName = 'Pro'
+        } else if (priceId === Deno.env.get('SNSGEN_STRIPE_ENTERPRISE_PRICE_ID')) {
+          planType = 'enterprise'
+          planName = 'Enterprise'
+        }
+
+        // stripe_customer_idでユーザーのサブスクリプション情報を更新
+        const { data: subData, error } = await supabase
+          .from('snsgen_subscriptions')
+          .update({
+            plan_type: planType,
+            status: subscription.status,
+            stripe_subscription_id: subscription.id,
+            stripe_price_id: priceId,
+            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            cancel_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
+            canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
+          })
+          .eq('stripe_customer_id', customerId)
+          .select('user_id')
+          .single()
+
+        if (error) {
+          console.error('Error updating subscription:', error)
+          throw error
+        }
+
+        // ウェルカムメール送信
+        if (subData) {
+          const { data: userData } = await supabase.auth.admin.getUserById(subData.user_id)
+
+          if (userData?.user?.email) {
+            const periodEnd = new Date(subscription.current_period_end * 1000).toLocaleDateString('ja-JP')
+
+            const emailSubject = `【PostCreator】${planName}プランへのご登録ありがとうございます`
+            const emailBody = `
+PostCreatorをご利用いただきありがとうございます。
+
+${planName}プランへのご登録が完了しました。
+
+■ サブスクリプション情報
+- プラン: ${planName}
+- ステータス: アクティブ
+- 次回更新日: ${periodEnd}
+
+サブスクリプションの詳細は、以下のページからご確認いただけます：
+${Deno.env.get('SITE_URL')}/subscription
+
+ご不明な点がございましたら、お気軽にお問い合わせください。
+
+---
+PostCreator運営チーム
+株式会社ウォーカー 新人類育成計画/BizITCo
+            `.trim()
+
+            console.log(`Checkout completed - Welcome email for: ${userData.user.email}`)
+            console.log(`Subject: ${emailSubject}`)
+            console.log(`Body: ${emailBody}`)
+          }
+        }
+
+        break
+      }
+
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
