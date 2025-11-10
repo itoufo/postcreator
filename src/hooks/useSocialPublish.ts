@@ -25,10 +25,10 @@ export function useSocialPublish() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      const functionName = snsType === 'X' ? 'publish-to-x' :
-                          snsType === 'Threads' ? 'publish-to-threads' :
-                          snsType === 'Instagram' ? 'publish-to-instagram' :
-                          'publish-to-note';
+      const functionName = snsType === 'X' ? 'snsgen_publish-to-x' :
+                          snsType === 'Threads' ? 'snsgen_publish-to-threads' :
+                          snsType === 'Instagram' ? 'snsgen_publish-to-instagram' :
+                          'snsgen_publish-to-note';
 
       const response = await fetch(`${supabaseUrl}/functions/v1/${functionName}`, {
         method: 'POST',

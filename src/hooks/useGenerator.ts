@@ -43,7 +43,7 @@ export function useGenerator() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      const response = await fetch(`${supabaseUrl}/functions/v1/generate-post`, {
+      const response = await fetch(`${supabaseUrl}/functions/v1/snsgen_generate-post`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${supabaseAnonKey}`,
