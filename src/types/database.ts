@@ -293,6 +293,129 @@ export interface Database {
           updated_at?: string;
         };
       };
+      snsgen_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          plan_type: 'free' | 'basic' | 'pro' | 'enterprise';
+          status: 'active' | 'canceled' | 'past_due' | 'paused' | 'trialing';
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          stripe_price_id: string | null;
+          current_period_start: string | null;
+          current_period_end: string | null;
+          cancel_at: string | null;
+          canceled_at: string | null;
+          trial_start: string | null;
+          trial_end: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plan_type?: 'free' | 'basic' | 'pro' | 'enterprise';
+          status?: 'active' | 'canceled' | 'past_due' | 'paused' | 'trialing';
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          stripe_price_id?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          cancel_at?: string | null;
+          canceled_at?: string | null;
+          trial_start?: string | null;
+          trial_end?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          plan_type?: 'free' | 'basic' | 'pro' | 'enterprise';
+          status?: 'active' | 'canceled' | 'past_due' | 'paused' | 'trialing';
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          stripe_price_id?: string | null;
+          current_period_start?: string | null;
+          current_period_end?: string | null;
+          cancel_at?: string | null;
+          canceled_at?: string | null;
+          trial_start?: string | null;
+          trial_end?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      snsgen_user_consents: {
+        Row: {
+          id: string;
+          user_id: string;
+          consent_type: 'terms' | 'privacy';
+          consent_version: string;
+          consented_at: string;
+          ip_address: string | null;
+          user_agent: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          consent_type: 'terms' | 'privacy';
+          consent_version: string;
+          consented_at?: string;
+          ip_address?: string | null;
+          user_agent?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          consent_type?: 'terms' | 'privacy';
+          consent_version?: string;
+          consented_at?: string;
+          ip_address?: string | null;
+          user_agent?: string | null;
+        };
+      };
+      snsgen_usage_quotas: {
+        Row: {
+          id: string;
+          user_id: string;
+          plan_type: string;
+          period_start: string;
+          period_end: string;
+          requests_count: number;
+          requests_limit: number;
+          accounts_count: number;
+          accounts_limit: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plan_type: string;
+          period_start: string;
+          period_end: string;
+          requests_count?: number;
+          requests_limit: number;
+          accounts_count?: number;
+          accounts_limit: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          plan_type?: string;
+          period_start?: string;
+          period_end?: string;
+          requests_count?: number;
+          requests_limit?: number;
+          accounts_count?: number;
+          accounts_limit?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;

@@ -7,6 +7,9 @@ import Accounts from '@/pages/Accounts';
 import Generator from '@/pages/Generator';
 import History from '@/pages/History';
 import Settings from '@/pages/Settings';
+import Subscription from '@/pages/Subscription';
+import Terms from '@/pages/Terms';
+import Privacy from '@/pages/Privacy';
 
 function App() {
   return (
@@ -54,6 +57,16 @@ function App() {
             </AuthGuard>
           }
         />
+        <Route
+          path="/subscription"
+          element={
+            <AuthGuard>
+              <Subscription />
+            </AuthGuard>
+          }
+        />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
